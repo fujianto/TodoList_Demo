@@ -2,7 +2,6 @@ package com.naisinpo.fujianto.zudolizt;
 
 import android.app.Activity;
 import android.content.ContentValues;
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -36,10 +35,17 @@ public class TodoDetailActivity extends Activity{
         mBodyText = (EditText) findViewById(R.id.todo_edit_description);
         mEditButton = (Button) findViewById(R.id.todo_edit_button);
 
-        Intent intent = getIntent();
-        todoUri = intent.getParcelableExtra(TodoEntry.CONTENT_ITEM_TYPE);   //getParcelableExtra to get URI from extra
+        //Used to get Passed param from MainActivity
+        Bundle extras = getIntent().getExtras();
 
-        if (todoUri != null) {
+        //Use URI from saved instance
+        if(bundle != null){
+            todoUri = bundle.getParcelable(TodoContract.TodoEntry.CONTENT_ITEM_TYPE);
+        }
+
+        //Use Uri from Passed param
+        if (extras != null) {
+            todoUri = extras.getParcelable(TodoEntry.CONTENT_ITEM_TYPE);   //getParcelableExtra to get URI from extra
             getTodoListDetail(todoUri);
         }
 
@@ -50,6 +56,12 @@ public class TodoDetailActivity extends Activity{
             }
         });
 
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(TodoEntry.CONTENT_ITEM_TYPE, todoUri);
     }
 
     // Grab todolist from database and display it to UI.

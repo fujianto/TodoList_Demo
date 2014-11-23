@@ -58,10 +58,11 @@ public class TodoProvider extends ContentProvider {
         final int match = sUriMatcher.match(uri);
         switch (match){
             case TODOS:
-
+                // No special WHERE condition
                 break;
             case TODO_ID:
                 // adding the ID to the original query
+                // Run WHERE condition if _ID = id from URI.
                 queryBuilder.appendWhere(TodoEntry._ID + "=" + uri.getLastPathSegment());
                 break;
 
@@ -69,6 +70,7 @@ public class TodoProvider extends ContentProvider {
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
 
+        // Run default Query with no WHERE condition
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         Cursor cursor = queryBuilder.query(
                 db,
@@ -112,6 +114,7 @@ public class TodoProvider extends ContentProvider {
                 id = db.insert(TodoEntry.TABLE_NAME, null, values);
 
                 if (id > 0) {
+                    // Return URI of the newly inserted data from db
                     returnUri = TodoEntry.buildTodoUri(id);
                 } else {
                     throw new android.database.SQLException("Failed to insert row into " + uri);
@@ -141,12 +144,14 @@ public class TodoProvider extends ContentProvider {
 
             case TODO_ID:
                 String id = uri.getLastPathSegment();
+                // Delete data with specified _ID
                 if (TextUtils.isEmpty(selection)) {
                     rowsDeleted = db.delete(
                             TodoEntry.TABLE_NAME,
                             TodoEntry._ID + "=" + id,
                             null);
                 } else {
+                // Delete data with specified _ID and selection
                     rowsDeleted = db.delete(
                             TodoEntry.TABLE_NAME,
                             TodoEntry._ID + "=" + id+ " and " + selection,
